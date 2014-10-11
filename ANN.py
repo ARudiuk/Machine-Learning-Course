@@ -56,8 +56,6 @@ class ANN:
             input_data = self.inputs
         self.hidden1 = []
         self.hidden2 = []  
-        print np.shape(input_data)
-        print np.shape(self.weights1)
         if self.hidden_layer_count == 0:
             self.outputs = np.dot(input_data, self.weights1)
         elif self.hidden_layer_count == 1:
@@ -72,7 +70,8 @@ class ANN:
             self.hidden2 = np.dot(self.hidden1, self.weights2)
             self.hidden2 = 1.0/(1.0+np.exp(-self.beta*self.hidden2))
             self.hidden2 = np.concatenate((np.ones((np.shape(self.hidden2)[0],1)),self.hidden2),axis=1)
-            self.outputs = np.dot(self.hidden2,self.weights3)        
+            self.outputs = np.dot(self.hidden2,self.weights3)
+            self.output =  1.0/(1.0+np.exp(-self.beta*self.outputs))       
         return 1.0/(1.0+np.exp(-self.beta*self.outputs))
 
     def train_n_iterations(self, iterations, learning_rate, plot_errors = False):
@@ -86,12 +85,15 @@ class ANN:
             points = []
 
         for i in range(iterations):
-            print i
+            self.outputs = self.forward_pass(self.valid)
+            valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
             self.outputs = self.forward_pass(self.train)
+            train_error = 0.5*np.sum((self.outputs-self.traint)**2)
 
-            error = 0.5*np.sum((self.outputs-self.traint)**2)
+            if plot_errors == True:
+                points.append([train_error, valid_error])
             if (np.mod(i,100)==0):
-                print "Iteration: ",i, " Error: ",error    
+                print "Iteration: ",i, " Error: ",train_error    
             deltao = self.beta*(self.outputs-self.traint)*self.outputs*(1.0-self.outputs)
             if self.hidden_layer_count == 0:
                 self.updatew1 = learning_rate*(np.dot(np.transpose(self.train),deltao)) + self.momentum*self.updatew1
@@ -110,9 +112,7 @@ class ANN:
                 self.updatew3 = learning_rate*(np.dot(np.transpose(self.hidden2),deltao)) + self.momentum*self.updatew3
                 self.weights1 -= self.updatew1
                 self.weights2 -= self.updatew2
-                self.weights3 -= self.updatew3            
-            if plot_errors == True:
-                points.append([self.confmat(inputs=self.train,targets=self.traint,print_info=False),self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
+                self.weights3 -= self.updatew3           
         if plot_errors == True:
             pl.plot(points)
             pl.show()
@@ -126,12 +126,19 @@ class ANN:
             points = []
 
         for i in range(iterations):
+            self.outputs = self.forward_pass(self.valid)
+            valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
+            self.outputs = self.forward_pass(self.train)
+            train_error = 0.5*np.sum((self.outputs-self.traint)**2)
+
+            if plot_errors == True:
+                    points.append([train_error, valid_error])
+            if (np.mod(i,100)==0):
+                print "Iteration: ",i, " Error: ",train_error    
+
             for j in range(np.shape(self.train)[0]):
                 self.outputs = self.forward_pass(self.train[j,:]*np.ones((1,self.feature_size)))
 
-                error = 0.5*np.sum((self.outputs-self.traint[j,:])**2)
-                if (np.mod(i,100)==0):
-                    print "Iteration: ",i, " Error: ",error    
                 #use jth term
                 deltao = self.beta*(self.outputs-self.traint[j])*self.outputs*(1.0-self.outputs)
                 if self.hidden_layer_count == 0:
@@ -152,9 +159,7 @@ class ANN:
                     self.updatew3 = learning_rate*(np.dot(np.transpose(self.hidden2),deltao)) + self.momentum*self.updatew3
                     self.weights1 -= self.updatew1
                     self.weights2 -= self.updatew2
-                    self.weights3 -= self.updatew3            
-                if plot_errors == True:
-                    points.append([self.confmat(inputs=self.train,targets=self.traint,print_info=False),self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
+                    self.weights3 -= self.updatew3           
         if plot_errors == True:
             pl.plot(points)
             pl.show()
