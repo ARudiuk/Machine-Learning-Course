@@ -56,6 +56,8 @@ class ANN:
             input_data = self.inputs
         self.hidden1 = []
         self.hidden2 = []  
+        print np.shape(input_data)
+        print np.shape(self.weights1)
         if self.hidden_layer_count == 0:
             self.outputs = np.dot(input_data, self.weights1)
         elif self.hidden_layer_count == 1:
@@ -84,6 +86,7 @@ class ANN:
             points = []
 
         for i in range(iterations):
+            print i
             self.outputs = self.forward_pass(self.train)
 
             error = 0.5*np.sum((self.outputs-self.traint)**2)
@@ -109,7 +112,7 @@ class ANN:
                 self.weights2 -= self.updatew2
                 self.weights3 -= self.updatew3            
             if plot_errors == True:
-                points.append([100-self.confmat(inputs=self.train,targets=self.traint,print_info=False),100-self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
+                points.append([self.confmat(inputs=self.train,targets=self.traint,print_info=False),self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
         if plot_errors == True:
             pl.plot(points)
             pl.show()
@@ -151,7 +154,7 @@ class ANN:
                     self.weights2 -= self.updatew2
                     self.weights3 -= self.updatew3            
                 if plot_errors == True:
-                    points.append([100-self.confmat(inputs=self.train,targets=self.traint,print_info=False),100-self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
+                    points.append([self.confmat(inputs=self.train,targets=self.traint,print_info=False),self.confmat(inputs=self.valid,targets=self.validt,print_info=False)])
         if plot_errors == True:
             pl.plot(points)
             pl.show()
