@@ -85,8 +85,10 @@ class ANN:
             points = []
 
         for i in range(iterations):
-            self.outputs = self.forward_pass(self.valid)
-            valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
+
+            if plot_errors == True:
+                self.outputs = self.forward_pass(self.valid)
+                valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
             self.outputs = self.forward_pass(self.train)
             train_error = 0.5*np.sum((self.outputs-self.traint)**2)
 
