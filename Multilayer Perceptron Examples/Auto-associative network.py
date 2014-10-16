@@ -9,6 +9,7 @@ random_inputs = random.rand(shape(inputs)[1],shape(inputs)[1])
 print shape(inputs)
 print shape(random_inputs)
 inputs = dot(inputs,random_inputs)
+print inputs
 
 targets = inputs
 
@@ -25,12 +26,12 @@ sys.path.insert(0, 'C:\Users\Alexander\Documents\GitHub\Machine-Learning-Course'
 hidden_layer_nodes = 20
 import ANN
 #intialize
-aa = ANN.ANN(inputs,targets, nhidden1 = hidden_layer_nodes,nlayers = 1,momentum = 0.9)
+aa = ANN.ANN(inputs,targets, nhidden1 = hidden_layer_nodes,nlayers = 1,momentum = 0)
 #train for n iterations
 #first parameter is number of iterations
 #second parameter is the learning rate
 #third parameter is a boolean of whether or not you want to track and plot the error during training
-aa.train_n_iterations(2000,0.1,plot_errors = False)
+aa.train_n_iterations(10000,0.001,plot_errors = False)
 #get the ouputs using the inputs
 #we are using all the inputs here because of no parameter is provided 
 #forward pass defaults to all the data
