@@ -4,16 +4,8 @@ from numpy import *
 data = loadtxt('numbers.dat',skiprows = 1)
 #reshape inputs into #imagesx#pixels
 inputs = reshape(data,(26,156))
-#add random encoding to input
-random_inputs = random.rand(shape(inputs)[1],shape(inputs)[1])
-print shape(inputs)
-print shape(random_inputs)
-inputs = dot(inputs,random_inputs)
-print inputs
 
 targets = inputs
-
-print shape(targets)
 
 #IMPORTANT
 #SET DIRECTORY TO WHERE ANN.py IS
@@ -36,7 +28,6 @@ aa.train_n_iterations(10000,0.001,plot_errors = False)
 #we are using all the inputs here because of no parameter is provided 
 #forward pass defaults to all the data
 results = aa.forward_pass()
-results = dot(results,linalg.inv(random_inputs))
 #get rid of bias from weights
 testWeight = aa.weights1[1:,:]
 #transpose so it is positioned same as input
@@ -56,7 +47,6 @@ figure(1)
 for i in range(26):
     subplot(5,6,1+i); imshow(results[i],'gray')
 #plot inputs
-inputs = dot(inputs,linalg.inv(random_inputs))
 inputs = reshape(inputs,(26,12,13))
 figure(2)
 for i in range(26):

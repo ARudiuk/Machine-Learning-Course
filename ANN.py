@@ -11,9 +11,9 @@ class ANN:
         #all variables are initialized, even ones that might not be used like the number of hidded nodes in a 
         #hidden layer
         if add_ones == True:
-            self.inputs = inputs
-        else:
             self.inputs = np.concatenate((np.ones((np.shape(inputs)[0], 1)), inputs),axis=1)
+        else:
+            self.inputs = inputs
         self.targets = targets
         #number of features plus bias
         self.feature_size = np.shape(self.inputs)[1]
@@ -103,7 +103,8 @@ class ANN:
         for i in range(iterations):
             #if plottting error calculate error for validation set 
             #since we will calculate error for training anyways to perform training
-            confmat_max = self.confmat(inputs = self.valid,targets=self.validt,print_info=False)
+            if plot_errors == True:
+                confmat_max = self.confmat(inputs = self.valid,targets=self.validt,print_info=False)
             if plot_errors == True:
                 self.outputs = self.forward_pass(self.valid)
                 valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
