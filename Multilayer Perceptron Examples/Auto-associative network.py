@@ -4,7 +4,16 @@ from numpy import *
 data = loadtxt('numbers.dat',skiprows = 1)
 #reshape inputs into #imagesx#pixels
 inputs = reshape(data,(26,156))
+#add random encoding to input
+random_inputs = random.rand(shape(inputs)[1],shape(inputs)[1])
+print shape(inputs)
+print shape(random_inputs)
+inputs = dot(inputs,random_inputs)
+print inputs
+
 targets = inputs
+
+print shape(targets)
 
 #IMPORTANT
 #SET DIRECTORY TO WHERE ANN.py IS
@@ -17,16 +26,17 @@ sys.path.insert(0, 'C:\Users\Alexander\Documents\GitHub\Machine-Learning-Course'
 hidden_layer_nodes = 20
 import ANN
 #intialize
-aa = ANN.ANN(inputs,targets, nhidden1 = hidden_layer_nodes,nlayers = 1,momentum = 0.9)
+aa = ANN.ANN(inputs,targets, nhidden1 = hidden_layer_nodes,nlayers = 1,momentum = 0)
 #train for n iterations
 #first parameter is number of iterations
 #second parameter is the learning rate
 #third parameter is a boolean of whether or not you want to track and plot the error during training
-aa.train_n_iterations(2000,0.1,plot_errors = False)
+aa.train_n_iterations(10000,0.001,plot_errors = False)
 #get the ouputs using the inputs
 #we are using all the inputs here because of no parameter is provided 
 #forward pass defaults to all the data
 results = aa.forward_pass()
+results = dot(results,linalg.inv(random_inputs))
 #get rid of bias from weights
 testWeight = aa.weights1[1:,:]
 #transpose so it is positioned same as input
@@ -46,6 +56,7 @@ figure(1)
 for i in range(26):
     subplot(5,6,1+i); imshow(results[i],'gray')
 #plot inputs
+inputs = dot(inputs,linalg.inv(random_inputs))
 inputs = reshape(inputs,(26,12,13))
 figure(2)
 for i in range(26):

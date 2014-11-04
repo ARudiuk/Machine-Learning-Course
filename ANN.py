@@ -5,12 +5,15 @@ import numpy as np
 class ANN:
 
     #Initlialize
-    def __init__(self, inputs, targets, nhidden1 = 0, nhidden2 = 0, nlayers = 1, momentum = 0, beta = 1):
+    def __init__(self, inputs, targets, nhidden1 = 0, nhidden2 = 0, nlayers = 1, momentum = 0, beta = 1, add_ones = True):
         #use positive ones for bias node as opposed to book and position on the left of input
         #only works for input that is two dimensional because of shape(x)[1] looking for size of second dimension\
         #all variables are initialized, even ones that might not be used like the number of hidded nodes in a 
         #hidden layer
-        self.inputs = np.concatenate((np.ones((np.shape(inputs)[0], 1)), inputs),axis=1)
+        if add_ones == True:
+            self.inputs = inputs
+        else:
+            self.inputs = np.concatenate((np.ones((np.shape(inputs)[0], 1)), inputs),axis=1)
         self.targets = targets
         #number of features plus bias
         self.feature_size = np.shape(self.inputs)[1]
@@ -95,11 +98,12 @@ class ANN:
             self.train = self.inputs
             self.traint = self.targets
         #if plotting error over time initialize array
-        if plot_errors == True:
-            points = []
+        points = []
+        confmat_max =0
         for i in range(iterations):
             #if plottting error calculate error for validation set 
             #since we will calculate error for training anyways to perform training
+            confmat_max = self.confmat(inputs = self.valid,targets=self.validt,print_info=False)
             if plot_errors == True:
                 self.outputs = self.forward_pass(self.valid)
                 valid_error = 0.5*np.sum((self.outputs-self.validt)**2)
@@ -111,8 +115,8 @@ class ANN:
                 points.append([train_error, valid_error])
             #print error every 100 iterations
             #make this user defined amount later
-            if (np.mod(i,100)==0):
-                print "Iteration: ",i, " Error: ",train_error    
+            # if (np.mod(i,100)==0):
+            #     print "Iteration: ",i, " Error: ",train_error    
             #calculate error based on logistic
             #add other activation functions later
             deltao = self.beta*(self.outputs-self.traint)*self.outputs*(1.0-self.outputs)
@@ -135,14 +139,15 @@ class ANN:
                 self.weights1 -= self.updatew1
                 self.weights2 -= self.updatew2
                 self.weights3 -= self.updatew3    
-        #if plotting then plot :)       
+        #if plotting then plot :) 
         if plot_errors == True:
             train_plot = [i[0] for i in points]
             valid_plot = [i[1] for i in points]
             pl.plot(train_plot, label = "train")
             pl.plot(valid_plot, label = "valid")
             pl.legend()
-            pl.show()
+            pl.show()      
+        return points,confmat_max
     #same thing as train_n_iterations except we have an extra loop to make it sequential
     #add randomization for data set after each epoch
     def train_n_iterations_seq(self, iterations, learning_rate, plot_errors = False):
